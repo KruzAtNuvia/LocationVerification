@@ -12,15 +12,15 @@
 
                         // Predefined geofenced locations
                         const authorizedLocations = [
-                            { lat: 37.7749, lng: -122.4194, radius: 500 },  // Example: San Francisco
-                            { lat: 34.0522, lng: -118.2437, radius: 1000 }, // Example: Los Angeles
+                            { lat: 37.7749, lng: -122.4194, radius: 500 },  
+                            { lat: 34.0522, lng: -118.2437, radius: 1000 }, 
                             { lat: 40.54360041620912, lng: -111.92974288241732, radius: 500},
                             { lat: 40.504989482930156, lng: -111.97410249944713, radius: 1000},
                         ];
 
                         // Function to calculate distance between two coordinates
                         function getDistance(lat1, lng1, lat2, lng2) {
-                            const R = 6371e3; // Earth radius in meters
+                            const R = 6371e3; 
                             const φ1 = (lat1 * Math.PI) / 180;
                             const φ2 = (lat2 * Math.PI) / 180;
                             const Δφ = ((lat2 - lat1) * Math.PI) / 180;
@@ -32,7 +32,7 @@
                                 Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
                             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-                            return R * c; // Distance in meters
+                            return R * c; 
                         }
 
                         // Validate user's location
@@ -53,7 +53,8 @@
                         if (accessGranted) {
                             window.location.href = "https://creatorapp.zoho.com/nuviasmiles/nuvia-directory/#Page:Redirect_Home_Page";
                         } else {
-                            document.body.innerHTML = "<h1>Access Denied</h1><p>You are outside the authorized location.</p>";
+                            // document.body.innerHTML = "<h1>Access Denied</h1><p>You are outside the authorized location.</p>";
+                            window.location.href = "https://creatorapp.zoho.com/nuviasmiles/nuvia-directory/#Page:Denied_Response_Page";
                         }
                     },
                     function (error) {
