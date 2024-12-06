@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Verification</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+
+                        // Predefined geofenced locations
+                        const authorizedLocations = [
+                            { lat: 37.7749, lng: -122.4194, radius: 500 },  // Example: San Francisco
+                            { lat: 34.0522, lng: -118.2437, radius: 1000 } // Example: Los Angeles
+                        ];
+
+                        // Function to calculate distance between two coordinates
+                        function getDistance(lat1, lng1, lat2, lng2) {
+                            const R = 6371e3; // Earth radius in meters
+                            const φ1 = (lat1 * Math.PI) / 180;
+                            const φ2 = (lat2 * Math.PI) / 180;
+                            const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+                            const Δλ = ((lng2 - lng1) * Math.PI) / 180;
+
+                            const a =
+                                Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                                Math.cos(φ1) * Math.cos(φ2) *
+                                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+                            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+                            return R * c; // Distance in meters
+                        }
+
+                        // Validate user's location
+                        let accessGranted = false;
+                        authorizedLocations.forEach((location) => {
+                            const distance = getDistance(
+                                userLat,
+                                userLng,
+                                location.lat,
+                                location.lng
+                            );
+                            if (distance <= location.radius) {
+                                accessGranted = true;
+                            }
+                        });
+
+                        // Redirect based on verification
+                        if (accessGranted) {
+                            window.location.href = "https://your-main-website.com";
+                        } else {
+                            document.body.innerHTML = "<h1>Access Denied</h1><p>You are outside the authorized location.</p>";
+                        }
+                    },
+                    function (error) {
+                        alert("Unable to retrieve location. Please enable location services.");
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Verifying Your Location...</h1>
+</body>
+</html>
