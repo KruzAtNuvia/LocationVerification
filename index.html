@@ -4,67 +4,73 @@
     <title>Verification Site</title>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        const userLat = position.coords.latitude;
-                        const userLng = position.coords.longitude;
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
 
-                        // Predefined geofenced locations
-                        const authorizedLocations = [
-                            { lat: 37.7749, lng: -122.4194, radius: 500 },  
-                            { lat: 34.0522, lng: -118.2437, radius: 1000 }, 
-                            { lat: 40.54360041620912, lng: -111.92974288241732, radius: 1000},
-                            { lat: 40.504989482930156, lng: -111.97410249944713, radius: 1000},
-                        ];
+                // Log location data for debugging
+                console.log(`User coordinates: (${userLat}, ${userLng}), Accuracy: ${accuracy}m`);
 
-                        // Function to calculate distance between two coordinates
-                        function getDistance(lat1, lng1, lat2, lng2) {
-                            const R = 6371e3; 
-                            const φ1 = (lat1 * Math.PI) / 180;
-                            const φ2 = (lat2 * Math.PI) / 180;
-                            const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-                            const Δλ = ((lng2 - lng1) * Math.PI) / 180;
+                // Predefined geofenced locations
+                const authorizedLocations = [
+                    { lat: 40.54360041620912, lng: -111.92974288241732, radius: 1000 },
+                    { lat: 40.504989482930156, lng: -111.97410249944713, radius: 1000 },
+                ];
 
-                            const a =
-                                Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                                Math.cos(φ1) * Math.cos(φ2) *
-                                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-                            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                function getDistance(lat1, lng1, lat2, lng2) {
+                    const R = 6371e3; 
+                    const φ1 = (lat1 * Math.PI) / 180;
+                    const φ2 = (lat2 * Math.PI) / 180;
+                    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+                    const Δλ = ((lng2 - lng1) * Math.PI) / 180;
 
-                            return R * c; 
-                        }
+                    const a =
+                        Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                        Math.cos(φ1) * Math.cos(φ2) *
+                        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-                        // Validate user's location
-                        let accessGranted = false;
-                        authorizedLocations.forEach((location) => {
-                            const distance = getDistance(
-                                userLat,
-                                userLng,
-                                location.lat,
-                                location.lng
-                            );
-                            if (distance <= location.radius) {
-                                accessGranted = true;
-                            }
-                        });
+                    return R * c; 
+                }
 
-                        // Redirect based on verification
-                        if (accessGranted) {
-                            window.location.href = "https://creatorapp.zoho.com/nuviasmiles/nuvia-directory/#Page:Redirect_Home_Page";
-                        } else {
-                            // document.body.innerHTML = "<h1>Access Denied</h1><p>You are outside the authorized location.</p>";
-                            window.location.href = "https://creatorapp.zoho.com/nuviasmiles/nuvia-directory/#Page:Denied_Response_Page";
-                        }
-                    },
-                    function (error) {
-                        alert("Unable to retrieve your location. Please enable location services.");
+                if (accuracy > 50) { 
+                    alert("Low location accuracy. Please try again in an open area.");
+                    return;
+                }
+
+                let accessGranted = false;
+                const buffer = 50; 
+
+                authorizedLocations.forEach((location) => {
+                    const distance = getDistance(
+                        userLat,
+                        userLng,
+                        location.lat,
+                        location.lng
+                    );
+                    console.log(`Distance to (${location.lat}, ${location.lng}): ${distance}m`);
+                    if (distance <= location.radius + buffer) {
+                        accessGranted = true;
                     }
-                );
-            } else {
-                alert("Geolocation is not supported by your browser.");
+                });
+
+                if (accessGranted) {
+                    window.location.href = "https://creatorapp.zoho.com/nuviasmiles/nuvia-directory/#Page:Redirect_Home_Page";
+                } else {
+                    window.location.href = "https://creatorapp.zoho.com/nuviasmiles/nuvia-directory/#Page:Denied_Response_Page";
+                }
+            },
+            function (error) {
+                alert("Unable to retrieve your location. Please enable location services.");
             }
-        });
+        );
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+});
     </script>
 </head>
 <body>
