@@ -15,7 +15,7 @@
                 console.log(`User coordinates: (${userLat}, ${userLng}), Accuracy: ${accuracy}m`);
 
                 // Predefined geofenced locations
-                const margin = 0.001; // Expand by ~111 meters (for latitude and near-equator longitude)
+                const margin = 0.010; 
                 const authorizedLocations = [
                       { lat: 40.5436, lng: -111.9297, radius: 1000 + margin },
                       { lat: 40.505018, lng: -111.974219, radius: 1000 + margin },
