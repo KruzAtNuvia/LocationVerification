@@ -2,7 +2,119 @@
 <html>
 <head>
     <title>Verification Site</title>
-    <script src="script.js">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+
+                // Log location data for debugging
+                console.log(`User coordinates: (${userLat}, ${userLng}), Accuracy: ${accuracy}m`);
+
+                // Predefined geofenced locations
+                const margin = 0.010; 
+                const authorizedLocations = [
+ /* Brandon Lab Location */             { lat: 40.505003, lng: -111.974151, radius: 1000 + margin },
+ /* Central (SLC) Lab Location */       { lat: 40.5436, lng: -111.9297, radius: 1000 + margin },
+ /* 2 Central (SLC) Lab Location */     { lat: 40.524466, lng: -111.9596898, radius: 1000 + margin },
+ /* Denver Lab Location */              { lat: 39.594526, lng: -104.839776, radius: 1000 + margin },
+ /* Dallas Lab Location */              { lat: 32.910464, lng: -96.804345, radius: 1000 + margin },
+ /* Fort Worth Lab Location */          { lat: 32.935622, lng: -97.225279, radius: 1000 + margin },
+ /* San Antonio Lab Location */         { lat: 29.631642, lng: -98.494007, radius: 1000 + margin },
+ /* Houston Lab Location */             { lat: 29.768412, lng: -95.779350, radius: 1000 + margin },
+ /* Phoenix Lab Location */             { lat: 33.725534, lng: -111.977992, radius: 1000 + margin },
+ /* Marietta Lab Location */            { lat: 34.018516, lng: -84.490369, radius: 1000 + margin },
+ /* Las Vegas Lab Location */           { lat: 36.078023, lng: -115.297812, radius: 1000 + margin },
+ /* Austin Lab Location */              { lat: 30.303571, lng: -97.740972, radius: 1000 + margin },
+ /* Orlando Lab Location */             { lat: 28.663416, lng: -81.368450, radius: 1000 + margin },
+ /* Chevy Chase Lab Location */         { lat: 39.052126, lng: -77.077154, radius: 1000 + margin },
+ /* Fort Lauderdale Lab Location */     { lat: 26.205911, lng: -80.145988, radius: 1000 + margin },
+ /* Detroit Lab Location */             { lat: 42.451821, lng: -83.210064, radius: 1000 + margin },
+ /* Nashville Lab Location */           { lat: 36.153740, lng: -86.811658, radius: 1000 + margin },
+ /* Alexandria Lab Location */          { lat: 38.823665, lng: -77.159445, radius: 1000 + margin },
+ /* Tampa Lab Location */               { lat: 28.040846, lng: -82.507198, radius: 1000 + margin },
+ /* Philly Lab Location */              { lat: 40.009594, lng: -75.216331, radius: 1000 + margin },
+ /* Minneapolis Lab Location */         { lat: 45.021284, lng: -93.162563, radius: 1000 + margin },
+ /* Pittsburgh Lab Location */          { lat: 40.563752, lng: -80.022686, radius: 1000 + margin },
+ /* Bellevue Lab Location */            { lat: 47.638570, lng: -122.192877, radius: 1000 + margin },
+ /* Chicago Lab Location */             { lat: 42.067733, lng: -87.995577, radius: 1000 + margin },
+ /* Baltimore Lab Location */           { lat: 39.370264, lng: -76.468328, radius: 1000 + margin },
+ /* Miami Lab Location */               { lat: 25.703504, lng: -80.294630, radius: 1000 + margin },
+ /* Dublin Lab Location */              { lat: 40.101853, lng: -83.149015, radius: 1000 + margin },
+ /* Fullerton Lab Location */           { lat: 33.892971, lng: -117.931089, radius: 1000 + margin },
+ /* San Diego Lab Location */           { lat: 32.875901, lng: -117.213240, radius: 1000 + margin },
+ /* Alpharetta Lab Location */          { lat: 34.070481, lng: -84.266746, radius: 1000 + margin },
+ /* Jacksonville Lab Location */        { lat: 30.243709, lng: -81.584955, radius: 1000 + margin },
+ /* Westbury Lab Location */            { lat: 40.745393, lng: -73.587495, radius: 1000 + margin },
+ /* Wellesley Lab Location */           { lat: 42.324651, lng: -71.252503, radius: 1000 + margin },
+ /* Indianapolis Lab Location */        { lat: 39.918460, lng: -86.159238, radius: 1000 + margin },
+ /* Milwaukee Lab Location */           { lat: 43.029631, lng: -88.115700, radius: 1000 + margin },
+ /* St. Louis Lab Location */           { lat: 38.673821, lng: -90.443891, radius: 1000 + margin },
+ /* Parsipanny Lab Location */          { lat: 40.869406, lng: -74.438309, radius: 1000 + margin },
+ /* Portland Lab Location */            { lat: 45.417116, lng: -122.717958, radius: 1000 + margin },
+ /* Moorestown Lab Location */          { lat: 39.971980, lng: -74.916011, radius: 1000 + margin },
+ /* Encino Lab Location */              { lat: 34.158554, lng: -118.500963, radius: 1000 + margin },
+ /* Lemont Lab Location */              { lat: 41.655452, lng: -88.007588, radius: 1000 + margin },
+ 
+                    
+                      
+                ];
+
+                function getDistance(lat1, lng1, lat2, lng2) {
+                    const R = 6371e3; 
+                    const φ1 = (lat1 * Math.PI) / 180;
+                    const φ2 = (lat2 * Math.PI) / 180;
+                    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+                    const Δλ = ((lng2 - lng1) * Math.PI) / 180;
+
+                    const a =
+                        Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                        Math.cos(φ1) * Math.cos(φ2) *
+                        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+                    return R * c; 
+                }
+
+                // if (accuracy > 1000) { 
+                //     alert("Low location accuracy. Please try again in an open area.");
+                //     return;
+                    
+                // }
+
+                let accessGranted = false;
+                const buffer = 100; 
+
+                authorizedLocations.forEach((location) => {
+                    const distance = getDistance(
+                        userLat,
+                        userLng,
+                        location.lat,
+                        location.lng
+                    );
+                    console.log(`Distance to (${location.lat}, ${location.lng}): ${distance}m`);
+                    if (distance <= location.radius + buffer) {
+                        accessGranted = true;
+                    }
+                });
+
+                if (accessGranted) {
+                    window.location.href = "https://creatorapp.zoho.com/nuviasmiles/nuvia-directory/#Page:Redirect_Home_Page";
+                } else {
+                    window.location.href = "https://creatorapp.zoho.com/nuviasmiles/nuvia-directory/#Form:Login_Check_Location?Denied_Response_Check=true";
+                }
+            },
+            function (error) {
+                alert("Unable to retrieve your location. Please enable location services.");
+            }
+        );
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+});
     </script>
 </head>
 <body>
